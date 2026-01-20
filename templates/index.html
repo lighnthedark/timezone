@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Clock & Currency Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+        }
+
+        .city-selectors {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .selector-group {
+            text-align: center;
+        }
+
+        .selector-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        select {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .clocks-container {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .clock-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 300px;
+            transition: transform 0.3s;
+        }
+
+        .clock-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .clock-card.day {
+            background: linear-gradient(180deg, rgba(255, 200, 100, 0.1) 0%, rgba(255, 150, 50, 0.05) 100%);
+        }
+
+        .clock-card.night {
+            background: linear-gradient(180deg, rgba(50, 50, 100, 0.3) 0%, rgba(20, 20, 50, 0.2) 100%);
+        }
+
+        .city-name {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #00d4ff;
+        }
+
+        .time-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .date-display {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .day-night-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .currency-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .currency-section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #7b2cbf;
+        }
+
+        .currency-input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .currency-input {
+            padding: 15px 20px;
+            font-size: 1.5rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 150px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .currency-label {
+            font-size: 1.2rem;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .convert-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .convert-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(123, 44, 191, 0.4);
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .converted-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .exchange-rate {
+            color: #888;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌍 World Clock & Currency</h1>
+        <p class="subtitle">Compare times and convert currency between cities</p>
+
+        <div class="city-selectors">
+            <div class="selector-group">
+                <label>From City</label>
+                <select id="city1">
+                    {% for city in cities %}
+                    <option value="{{ city }}" {% if city=='Austin, USA' %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="selector-group">
+                <label>To City</label>
+                <select id="city2">
+                    {% for city in cities %}
+                    <option value="{{ city }}" {% if city=='Palermo, Sicily' %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="clocks-container">
+            <div class="clock-card" id="clock1">
+                <div class="day-night-icon" id="icon1">🌞</div>
+                <div class="city-name" id="cityName1">Austin, USA</div>
+                <div class="time-display" id="time1">--:--:-- --</div>
+                <div class="date-display" id="date1">Loading...</div>
+            </div>
+            <div class="clock-card" id="clock2">
+                <div class="day-night-icon" id="icon2">🌙</div>
+                <div class="city-name" id="cityName2">Palermo, Sicily</div>
+                <div class="time-display" id="time2">--:--:-- --</div>
+                <div class="date-display" id="date2">Loading...</div>
+            </div>
+        </div>
+
+        <div class="currency-section">
+            <h2>💱 Currency Converter</h2>
+            <div class="currency-input-group">
+                <input type="number" id="amount" class="currency-input" value="100" min="0">
+                <span class="currency-label" id="fromCurrency">USD</span>
+                <span style="font-size: 1.5rem;">→</span>
+                <span class="currency-label" id="toCurrency">EUR</span>
+            </div>
+            <button class="convert-btn" onclick="convertCurrency()">Convert Currency</button>
+            <div class="result" id="result">
+                <div class="converted-amount" id="convertedAmount">€85.00</div>
+                <div class="exchange-rate" id="exchangeRate">1 USD = 0.85 EUR</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const city1Select = document.getElementById('city1');
+        const city2Select = document.getElementById('city2');
+
+        function updateTimes() {
+            fetch('/get_time', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ city1: city1Select.value, city2: city2Select.value })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cityName1').textContent = data.city1.name;
+                    document.getElementById('time1').textContent = data.city1.time;
+                    document.getElementById('date1').textContent = data.city1.date;
+                    document.getElementById('cityName2').textContent = data.city2.name;
+                    document.getElementById('time2').textContent = data.city2.time;
+                    document.getElementById('date2').textContent = data.city2.date;
+
+                    const clock1 = document.getElementById('clock1');
+                    const clock2 = document.getElementById('clock2');
+                    const icon1 = document.getElementById('icon1');
+                    const icon2 = document.getElementById('icon2');
+
+                    if (data.city1.hour >= 6 && data.city1.hour < 18) {
+                        icon1.textContent = '🌞'; clock1.className = 'clock-card day';
+                    } else {
+                        icon1.textContent = '🌙'; clock1.className = 'clock-card night';
+                    }
+                    if (data.city2.hour >= 6 && data.city2.hour < 18) {
+                        icon2.textContent = '🌞'; clock2.className = 'clock-card day';
+                    } else {
+                        icon2.textContent = '🌙'; clock2.className = 'clock-card night';
+                    }
+                });
+        }
+
+        function convertCurrency() {
+            fetch('/convert_currency', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ city1: city1Select.value, city2: city2Select.value, amount: document.getElementById('amount').value })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) { alert(data.error); return; }
+                    const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'AUD': 'A$', 'CAD': 'C$', 'MXN': '$', 'BRL': 'R$', 'INR': '₹', 'SGD': 'S$', 'HKD': 'HK$', 'AED': 'د.إ' };
+                    document.getElementById('convertedAmount').textContent = (symbols[data.to_currency] || data.to_currency) + data.converted.toLocaleString();
+                    document.getElementById('exchangeRate').textContent = '1 ' + data.from_currency + ' = ' + data.rate + ' ' + data.to_currency;
+                    document.getElementById('fromCurrency').textContent = data.from_currency;
+                    document.getElementById('toCurrency').textContent = data.to_currency;
+                    document.getElementById('result').classList.add('show');
+                });
+        }
+
+        city1Select.addEventListener('change', () => { updateTimes(); document.getElementById('result').classList.remove('show'); });
+        city2Select.addEventListener('change', () => { updateTimes(); document.getElementById('result').classList.remove('show'); });
+
+        updateTimes();
+        setInterval(updateTimes, 1000);
+    </script>
+</body>
+
+</html>
