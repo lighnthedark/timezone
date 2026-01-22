@@ -5,35 +5,36 @@ import pytz
 
 app = Flask(__name__)
 
-# Free currency API
 CURRENCY_API = "https://api.exchangerate-api.com/v4/latest/"
+WEATHER_API = "https://api.open-meteo.com/v1/forecast"
 
-# Major cities with their timezones and currencies
 CITIES = {
-    'Austin, USA': {'timezone': 'America/Chicago', 'currency': 'USD'},
-    'New York, USA': {'timezone': 'America/New_York', 'currency': 'USD'},
-    'Los Angeles, USA': {'timezone': 'America/Los_Angeles', 'currency': 'USD'},
-    'London, UK': {'timezone': 'Europe/London', 'currency': 'GBP'},
-    'Paris, France': {'timezone': 'Europe/Paris', 'currency': 'EUR'},
-    'Rome, Italy': {'timezone': 'Europe/Rome', 'currency': 'EUR'},
-    'Palermo, Sicily': {'timezone': 'Europe/Rome', 'currency': 'EUR'},
-    'Berlin, Germany': {'timezone': 'Europe/Berlin', 'currency': 'EUR'},
-    'Tokyo, Japan': {'timezone': 'Asia/Tokyo', 'currency': 'JPY'},
-    'Sydney, Australia': {'timezone': 'Australia/Sydney', 'currency': 'AUD'},
-    'Dubai, UAE': {'timezone': 'Asia/Dubai', 'currency': 'AED'},
-    'Toronto, Canada': {'timezone': 'America/Toronto', 'currency': 'CAD'},
-    'Mexico City, Mexico': {'timezone': 'America/Mexico_City', 'currency': 'MXN'},
-    'Sao Paulo, Brazil': {'timezone': 'America/Sao_Paulo', 'currency': 'BRL'},
-    'Mumbai, India': {'timezone': 'Asia/Kolkata', 'currency': 'INR'},
-    'Singapore': {'timezone': 'Asia/Singapore', 'currency': 'SGD'},
-    'Hong Kong': {'timezone': 'Asia/Hong_Kong', 'currency': 'HKD'},
-    'Amsterdam, Netherlands': {'timezone': 'Europe/Amsterdam', 'currency': 'EUR'},
+    'Austin, USA': {'timezone': 'America/Chicago', 'currency': 'USD', 'lat': 30.27, 'lon': -97.74},
+    'New York, USA': {'timezone': 'America/New_York', 'currency': 'USD', 'lat': 40.71, 'lon': -74.01},
+    'Los Angeles, USA': {'timezone': 'America/Los_Angeles', 'currency': 'USD', 'lat': 34.05, 'lon': -118.24},
+    'London, UK': {'timezone': 'Europe/London', 'currency': 'GBP', 'lat': 51.51, 'lon': -0.13},
+    'Paris, France': {'timezone': 'Europe/Paris', 'currency': 'EUR', 'lat': 48.86, 'lon': 2.35},
+    'Rome, Italy': {'timezone': 'Europe/Rome', 'currency': 'EUR', 'lat': 41.90, 'lon': 12.50},
+    'Palermo, Sicily': {'timezone': 'Europe/Rome', 'currency': 'EUR', 'lat': 38.12, 'lon': 13.36},
+    'Berlin, Germany': {'timezone': 'Europe/Berlin', 'currency': 'EUR', 'lat': 52.52, 'lon': 13.41},
+    'Tokyo, Japan': {'timezone': 'Asia/Tokyo', 'currency': 'JPY', 'lat': 35.68, 'lon': 139.69},
+    'Sydney, Australia': {'timezone': 'Australia/Sydney', 'currency': 'AUD', 'lat': -33.87, 'lon': 151.21},
+    'Dubai, UAE': {'timezone': 'Asia/Dubai', 'currency': 'AED', 'lat': 25.20, 'lon': 55.27},
+    'Toronto, Canada': {'timezone': 'America/Toronto', 'currency': 'CAD', 'lat': 43.65, 'lon': -79.38},
+    'Mexico City, Mexico': {'timezone': 'America/Mexico_City', 'currency': 'MXN', 'lat': 19.43, 'lon': -99.13},
+    'Sao Paulo, Brazil': {'timezone': 'America/Sao_Paulo', 'currency': 'BRL', 'lat': -23.55, 'lon': -46.63},
+    'Mumbai, India': {'timezone': 'Asia/Kolkata', 'currency': 'INR', 'lat': 19.08, 'lon': 72.88},
+    'Singapore': {'timezone': 'Asia/Singapore', 'currency': 'SGD', 'lat': 1.35, 'lon': 103.82},
+    'Hong Kong': {'timezone': 'Asia/Hong_Kong', 'currency': 'HKD', 'lat': 22.32, 'lon': 114.17},
+    'Amsterdam, Netherlands': {'timezone': 'Europe/Amsterdam', 'currency': 'EUR', 'lat': 52.37, 'lon': 4.90},
 }
+
 
 @app.route('/')
 def index():
     cities = list(CITIES.keys())
     return render_template('index.html', cities=cities)
+
 
 @app.route('/get_time', methods=['POST'])
 def get_time():
@@ -43,7 +44,7 @@ def get_time():
     tz1 = pytz.timezone(CITIES[city1]['timezone'])
     tz2 = pytz.timezone(CITIES[city2]['timezone'])
     
-    now = datetime.now()
+    now = datetime.now(pytz.UTC)
     time1 = now.astimezone(tz1)
     time2 = now.astimezone(tz2)
     
@@ -62,32 +63,102 @@ def get_time():
         }
     })
 
+
+@app.route('/get_weather', methods=['POST'])
+def get_weather():
+    city1 = request.json.get('city1')
+    city2 = request.json.get('city2')
+    
+    def fetch_weather(city):
+        lat = CITIES[city]['lat']
+        lon = CITIES[city]['lon']
+        try:
+            response = requests.get(
+                WEATHER_API,
+                params={
+                    'latitude': lat,
+                    'longitude': lon,
+                    'current_weather': True
+                },
+                timeout=5
+            )
+            data = response.json()
+            temp_c = data['current_weather']['temperature']
+            temp_f = round(temp_c * 9/5 + 32)
+            weather_code = data['current_weather']['weathercode']
+            
+            # Weather code to emoji and description
+            weather_map = {
+                0: ('☀️', 'Clear sky'),
+                1: ('🌤️', 'Mainly clear'),
+                2: ('⛅', 'Partly cloudy'),
+                3: ('☁️', 'Overcast'),
+                45: ('🌫️', 'Foggy'),
+                48: ('🌫️', 'Depositing rime fog'),
+                51: ('🌧️', 'Light drizzle'),
+                53: ('🌧️', 'Moderate drizzle'),
+                55: ('🌧️', 'Dense drizzle'),
+                61: ('🌧️', 'Slight rain'),
+                63: ('🌧️', 'Moderate rain'),
+                65: ('🌧️', 'Heavy rain'),
+                71: ('🌨️', 'Slight snow'),
+                73: ('🌨️', 'Moderate snow'),
+                75: ('🌨️', 'Heavy snow'),
+                80: ('🌦️', 'Rain showers'),
+                81: ('🌦️', 'Moderate showers'),
+                82: ('🌦️', 'Violent showers'),
+                95: ('⛈️', 'Thunderstorm'),
+                96: ('⛈️', 'Thunderstorm with hail'),
+                99: ('⛈️', 'Thunderstorm with heavy hail'),
+            }
+            
+            emoji, description = weather_map.get(weather_code, ('🌡️', 'Unknown'))
+            
+            return {
+                'temp_c': round(temp_c),
+                'temp_f': temp_f,
+                'emoji': emoji,
+                'description': description
+            }
+        except Exception as e:
+            return {
+                'temp_c': '--',
+                'temp_f': '--',
+                'emoji': '❓',
+                'description': 'Unable to fetch weather'
+            }
+    
+    return jsonify({
+        'city1': fetch_weather(city1),
+        'city2': fetch_weather(city2)
+    })
+
+
 @app.route('/convert_currency', methods=['POST'])
 def convert_currency():
     city1 = request.json.get('city1')
     city2 = request.json.get('city2')
-    amount = float(request.json.get('amount', 1))
+    amount = float(request.json.get('amount', 100))
     
-    currency1 = CITIES[city1]['currency']
-    currency2 = CITIES[city2]['currency']
+    from_currency = CITIES[city1]['currency']
+    to_currency = CITIES[city2]['currency']
     
     try:
-        response = requests.get(f"{CURRENCY_API}{currency1}")
+        response = requests.get(CURRENCY_API + from_currency, timeout=5)
         data = response.json()
-        rate = data['rates'][currency2]
-        converted = amount * rate
+        rate = data['rates'][to_currency]
+        converted = round(amount * rate, 2)
         
         return jsonify({
-            'from_currency': currency1,
-            'to_currency': currency2,
+            'from_currency': from_currency,
+            'to_currency': to_currency,
             'amount': amount,
-            'converted': round(converted, 2),
+            'converted': converted,
             'rate': round(rate, 4)
         })
-    except:
-        return jsonify({'error': 'Could not fetch exchange rate'}), 400
+    except Exception as e:
+        return jsonify({'error': 'Unable to fetch exchange rates'})
+
 
 if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5002))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=True, port=5002)

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Clock & Currency Converter</title>
+    <title>World Clock, Weather & Currency</title>
     <style>
         * {
             margin: 0;
@@ -122,11 +122,34 @@
         .date-display {
             color: #888;
             font-size: 1.1rem;
+            margin-bottom: 15px;
         }
 
         .day-night-icon {
             font-size: 3rem;
             margin-bottom: 15px;
+        }
+
+        .weather-display {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .weather-emoji {
+            font-size: 2.5rem;
+        }
+
+        .weather-temp {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .weather-desc {
+            color: #888;
+            font-size: 0.9rem;
         }
 
         .currency-section {
@@ -216,8 +239,8 @@
 
 <body>
     <div class="container">
-        <h1>🌍 World Clock & Currency</h1>
-        <p class="subtitle">Compare times and convert currency between cities</p>
+        <h1>🌍 World Clock, Weather & Currency</h1>
+        <p class="subtitle">Compare times, weather, and currency between cities</p>
 
         <div class="city-selectors">
             <div class="selector-group">
@@ -244,12 +267,22 @@
                 <div class="city-name" id="cityName1">Austin, USA</div>
                 <div class="time-display" id="time1">--:--:-- --</div>
                 <div class="date-display" id="date1">Loading...</div>
+                <div class="weather-display">
+                    <div class="weather-emoji" id="weatherEmoji1">🌤️</div>
+                    <div class="weather-temp" id="weatherTemp1">--°F / --°C</div>
+                    <div class="weather-desc" id="weatherDesc1">Loading...</div>
+                </div>
             </div>
             <div class="clock-card" id="clock2">
                 <div class="day-night-icon" id="icon2">🌙</div>
                 <div class="city-name" id="cityName2">Palermo, Sicily</div>
                 <div class="time-display" id="time2">--:--:-- --</div>
                 <div class="date-display" id="date2">Loading...</div>
+                <div class="weather-display">
+                    <div class="weather-emoji" id="weatherEmoji2">🌤️</div>
+                    <div class="weather-temp" id="weatherTemp2">--°F / --°C</div>
+                    <div class="weather-desc" id="weatherDesc2">Loading...</div>
+                </div>
             </div>
         </div>
 
@@ -306,6 +339,24 @@
                 });
         }
 
+        function updateWeather() {
+            fetch('/get_weather', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ city1: city1Select.value, city2: city2Select.value })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('weatherEmoji1').textContent = data.city1.emoji;
+                    document.getElementById('weatherTemp1').textContent = data.city1.temp_f + '°F / ' + data.city1.temp_c + '°C';
+                    document.getElementById('weatherDesc1').textContent = data.city1.description;
+
+                    document.getElementById('weatherEmoji2').textContent = data.city2.emoji;
+                    document.getElementById('weatherTemp2').textContent = data.city2.temp_f + '°F / ' + data.city2.temp_c + '°C';
+                    document.getElementById('weatherDesc2').textContent = data.city2.description;
+                });
+        }
+
         function convertCurrency() {
             fetch('/convert_currency', {
                 method: 'POST',
@@ -324,11 +375,21 @@
                 });
         }
 
-        city1Select.addEventListener('change', () => { updateTimes(); document.getElementById('result').classList.remove('show'); });
-        city2Select.addEventListener('change', () => { updateTimes(); document.getElementById('result').classList.remove('show'); });
+        city1Select.addEventListener('change', () => {
+            updateTimes();
+            updateWeather();
+            document.getElementById('result').classList.remove('show');
+        });
+        city2Select.addEventListener('change', () => {
+            updateTimes();
+            updateWeather();
+            document.getElementById('result').classList.remove('show');
+        });
 
         updateTimes();
+        updateWeather();
         setInterval(updateTimes, 1000);
+        setInterval(updateWeather, 300000); // Update weather every 5 minutes
     </script>
 </body>
 
