@@ -82,7 +82,6 @@ def get_weather():
     },
     headers={'User-Agent': 'Mozilla/5.0'},
     timeout=5
-)
             )
             data = response.json()
             temp_c = data['current_weather']['temperature']
