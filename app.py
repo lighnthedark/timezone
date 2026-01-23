@@ -74,13 +74,15 @@ def get_weather():
         lon = CITIES[city]['lon']
         try:
             response = requests.get(
-                WEATHER_API,
-                params={
-                    'latitude': lat,
-                    'longitude': lon,
-                    'current_weather': True
-                },
-                timeout=5
+    WEATHER_API,
+    params={
+        'latitude': lat,
+        'longitude': lon,
+        'current_weather': True
+    },
+    headers={'User-Agent': 'Mozilla/5.0'},
+    timeout=5
+)
             )
             data = response.json()
             temp_c = data['current_weather']['temperature']
