@@ -121,6 +121,7 @@ def get_weather():
                 'description': description
             }
         except Exception as e:
+            print(f"Weather error: {e}")
             return {
                 'temp_c': '--',
                 'temp_f': '--',
