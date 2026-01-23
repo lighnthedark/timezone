@@ -36,6 +36,20 @@ def index():
     return render_template('index.html', cities=cities)
 
 
+@app.route('/test_weather')
+def test_weather():
+    try:
+        response = requests.get(
+            "https://api.open-meteo.com/v1/forecast",
+            params={'latitude': 30.27, 'longitude': -97.74, 'current_weather': True},
+            headers={'User-Agent': 'Mozilla/5.0'},
+            timeout=10
+        )
+        return jsonify({'status': 'success', 'data': response.json()})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
 @app.route('/get_time', methods=['POST'])
 def get_time():
     city1 = request.json.get('city1')
@@ -81,7 +95,7 @@ def get_weather():
                     'current_weather': True
                 },
                 headers={'User-Agent': 'Mozilla/5.0'},
-                timeout=5
+                timeout=10
             )
             data = response.json()
             temp_c = data['current_weather']['temperature']
