@@ -88,7 +88,6 @@ def get_weather():
             temp_f = round(temp_c * 9/5 + 32)
             weather_code = data['current_weather']['weathercode']
             
-            # Weather code to emoji and description
             weather_map = {
                 0: ('☀️', 'Clear sky'),
                 1: ('🌤️', 'Mainly clear'),
