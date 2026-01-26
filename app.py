@@ -6,7 +6,7 @@ import pytz
 app = Flask(__name__)
 
 CURRENCY_API = "https://api.exchangerate-api.com/v4/latest/"
-WEATHER_API = "https://api.open-meteo.com/v1/forecast"
+WEATHER_API_KEY = "afc7bdc2a8464e63bf5201444262601"
 
 CITIES = {
     'Austin, USA': {'timezone': 'America/Chicago', 'currency': 'USD', 'lat': 30.27, 'lon': -97.74},
@@ -40,9 +40,7 @@ def index():
 def test_weather():
     try:
         response = requests.get(
-            "https://api.open-meteo.com/v1/forecast",
-            params={'latitude': 30.27, 'longitude': -97.74, 'current_weather': True},
-            headers={'User-Agent': 'Mozilla/5.0'},
+            f"http://api.weatherapi.com/v1/current.json?key={WEATHER_API_KEY}&q=30.27,-97.74",
             timeout=10
         )
         return jsonify({'status': 'success', 'data': response.json()})
@@ -88,51 +86,39 @@ def get_weather():
         lon = CITIES[city]['lon']
         try:
             response = requests.get(
-                WEATHER_API,
-                params={
-                    'latitude': lat,
-                    'longitude': lon,
-                    'current_weather': True
-                },
-                headers={'User-Agent': 'Mozilla/5.0'},
+                f"http://api.weatherapi.com/v1/current.json?key={WEATHER_API_KEY}&q={lat},{lon}",
                 timeout=10
             )
             data = response.json()
-            temp_c = data['current_weather']['temperature']
-            temp_f = round(temp_c * 9/5 + 32)
-            weather_code = data['current_weather']['weathercode']
             
-            weather_map = {
-                0: ('☀️', 'Clear sky'),
-                1: ('🌤️', 'Mainly clear'),
-                2: ('⛅', 'Partly cloudy'),
-                3: ('☁️', 'Overcast'),
-                45: ('🌫️', 'Foggy'),
-                48: ('🌫️', 'Depositing rime fog'),
-                51: ('🌧️', 'Light drizzle'),
-                53: ('🌧️', 'Moderate drizzle'),
-                55: ('🌧️', 'Dense drizzle'),
-                61: ('🌧️', 'Slight rain'),
-                63: ('🌧️', 'Moderate rain'),
-                65: ('🌧️', 'Heavy rain'),
-                71: ('🌨️', 'Slight snow'),
-                73: ('🌨️', 'Moderate snow'),
-                75: ('🌨️', 'Heavy snow'),
-                80: ('🌦️', 'Rain showers'),
-                81: ('🌦️', 'Moderate showers'),
-                82: ('🌦️', 'Violent showers'),
-                95: ('⛈️', 'Thunderstorm'),
-                96: ('⛈️', 'Thunderstorm with hail'),
-                99: ('⛈️', 'Thunderstorm with heavy hail'),
-            }
+            temp_c = data['current']['temp_c']
+            temp_f = data['current']['temp_f']
+            condition = data['current']['condition']['text']
             
-            emoji, description = weather_map.get(weather_code, ('🌡️', 'Unknown'))
+            # Map conditions to emojis
+            condition_lower = condition.lower()
+            if 'sun' in condition_lower or 'clear' in condition_lower:
+                emoji = '☀️'
+            elif 'cloud' in condition_lower or 'overcast' in condition_lower:
+                emoji = '☁️'
+            elif 'rain' in condition_lower or 'drizzle' in condition_lower:
+                emoji = '🌧️'
+            elif 'snow' in condition_lower:
+                emoji = '🌨️'
+            elif 'thunder' in condition_lower or 'storm' in condition_lower:
+                emoji = '⛈️'
+            elif 'fog' in condition_lower or 'mist' in condition_lower:
+                emoji = '🌫️'
+            elif 'partly' in condition_lower:
+                emoji = '⛅'
+            else:
+                emoji = '🌤️'
             
             return {
                 'temp_c': round(temp_c),
-                'temp_f': temp_f,
+                'temp_f': round(temp_f),
                 'emoji': emoji,
-                'description': description
+                'description': condition
             }
         except Exception as e:
             print(f"Weather error: {e}")
