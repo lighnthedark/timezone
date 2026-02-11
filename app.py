@@ -30,7 +30,6 @@ CITIES = {
     'Tokyo, Japan': {'timezone': 'Asia/Tokyo', 'currency': 'JPY', 'lat': 35.68, 'lon': 139.69},
     'Sydney, Australia': {'timezone': 'Australia/Sydney', 'currency': 'AUD', 'lat': -33.87, 'lon': 151.21},
 }
-}
 
 
 @app.route('/')
