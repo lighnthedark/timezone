@@ -9,6 +9,13 @@ CURRENCY_API = "https://api.exchangerate-api.com/v4/latest/"
 WEATHER_API_KEY = "afc7bdc2a8464e63bf5201444262601"
 
 CITIES = {
+    'Madrid, Spain': {'timezone': 'Europe/Madrid', 'currency': 'EUR', 'lat': 40.42, 'lon': -3.70},
+    'Beijing, China': {'timezone': 'Asia/Shanghai', 'currency': 'CNY', 'lat': 39.90, 'lon': 116.40},
+    'Panama City, Panama': {'timezone': 'America/Panama', 'currency': 'PAB', 'lat': 8.98, 'lon': -79.52},
+    'Quito, Ecuador': {'timezone': 'America/Guayaquil', 'currency': 'USD', 'lat': -0.18, 'lon': -78.47},
+    'Lima, Peru': {'timezone': 'America/Lima', 'currency': 'PEN', 'lat': -12.05, 'lon': -77.04},
+    'Caracas, Venezuela': {'timezone': 'America/Caracas', 'currency': 'VES', 'lat': 10.48, 'lon': -66.90},
+    'Santo Domingo, Dom. Rep.': {'timezone': 'America/Santo_Domingo', 'currency': 'DOP', 'lat': 18.47, 'lon': -69.90},
     'Austin, USA': {'timezone': 'America/Chicago', 'currency': 'USD', 'lat': 30.27, 'lon': -97.74},
     'New York, USA': {'timezone': 'America/New_York', 'currency': 'USD', 'lat': 40.71, 'lon': -74.01},
     'Los Angeles, USA': {'timezone': 'America/Los_Angeles', 'currency': 'USD', 'lat': 34.05, 'lon': -118.24},
