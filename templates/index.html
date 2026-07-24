@@ -372,7 +372,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) { alert(data.error); return; }
-                    const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'AUD': 'A$', 'CAD': 'C$', 'MXN': '$', 'BRL': 'R$', 'INR': '₹', 'SGD': 'S$', 'HKD': 'HK$', 'AED': 'د.إ' };
+                    const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'AUD': 'A$', 'CAD': 'C$', 'MXN': 'Mex$', 'BRL': 'R$', 'INR': '₹', 'SGD': 'S$', 'HKD': 'HK$', 'AED': 'د.إ' };
                     document.getElementById('convertedAmount').textContent = (symbols[data.to_currency] || data.to_currency) + data.converted.toLocaleString();
                     document.getElementById('exchangeRate').textContent = '1 ' + data.from_currency + ' = ' + data.rate + ' ' + data.to_currency;
                     document.getElementById('fromCurrency').textContent = data.from_currency;
