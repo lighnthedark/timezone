@@ -21,7 +21,7 @@ CITIES = {
     'Los Angeles, USA': {'timezone': 'America/Los_Angeles', 'currency': 'USD', 'lat': 34.05, 'lon': -118.24},
     'Toronto, Canada': {'timezone': 'America/Toronto', 'currency': 'CAD', 'lat': 43.65, 'lon': -79.38},
     'Mexico City, Mexico': {'timezone': 'America/Mexico_City', 'currency': 'MXN', 'lat': 19.43, 'lon': -99.13},
-    'Sao Paulo, Brazil': {'timezone': 'America/Sao_Paulo', 'currency': 'BRL', 'lat': -23.55, 'lon': -46.63},
+    'Mérida, Mexico': {'timezone': 'America/Merida', 'currency': 'MXN', 'lat': 20.97, 'lon': -89.62},    'Sao Paulo, Brazil': {'timezone': 'America/Sao_Paulo', 'currency': 'BRL', 'lat': -23.55, 'lon': -46.63},
     'London, UK': {'timezone': 'Europe/London', 'currency': 'GBP', 'lat': 51.51, 'lon': -0.13},
     'Paris, France': {'timezone': 'Europe/Paris', 'currency': 'EUR', 'lat': 48.86, 'lon': 2.35},
     'Lisbon, Portugal': {'timezone': 'Europe/Lisbon', 'currency': 'EUR', 'lat': 38.72, 'lon': -9.14},
